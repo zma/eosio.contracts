@@ -25,7 +25,9 @@
 #define CHANNEL_RAM_AND_NAMEBID_FEES_TO_REX 1
 
 // Statistic parameters
-// interval length, in seconds
+// interval length, in seconds.
+// the interval should be strictly larger than the block time
+// and multiple times of the block time
 #define STATISTICS_NEW_ACCOUNTS_INTERVAL 2
 // number of intervals to keep
 #define STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT 365
@@ -531,9 +533,6 @@ namespace eosiosystem {
 
       // accumulated all number of accounts since this mechanisms takes effect
       uint64_t accumulated_accounts_count;
-
-      // last block generation epoch
-      uint64_t last_block_generated_at;
 
       uint64_t primary_key()const { return 1; }
    };
