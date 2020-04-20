@@ -94,8 +94,8 @@ namespace eosiosystem {
             // update accountcntrm
             accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
                row.new_accounts_counter_start_interval = curepoch;
-               row.new_accounts_counter_start_interval_pos = nnewstartpos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
-            }
+               row.new_accounts_counter_start_interval_pos = newstartpos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
+            });
          }
       } else {
          // initialized the counters
