@@ -24,6 +24,12 @@
 // be set to 0.
 #define CHANNEL_RAM_AND_NAMEBID_FEES_TO_REX 1
 
+// Statistic parameters
+// interval length, in seconds
+#define STATISTICS_NEW_ACCOUNTS_INTERVAL 2
+// number of intervals to keep
+#define STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT 365
+
 namespace eosiosystem {
 
    using eosio::asset;
@@ -80,7 +86,7 @@ namespace eosiosystem {
 
    /**
     * eosio.system contract
-    * 
+    *
     * eosio.system contract defines the structures and actions needed for blockchain's core functionality.
     * - Users can stake tokens for CPU and Network bandwidth, and then vote for producers or
     *    delegate their vote to a proxy.
@@ -515,6 +521,33 @@ namespace eosiosystem {
 
    typedef eosio::multi_index< "rexqueue"_n, rex_order,
                                indexed_by<"bytime"_n, const_mem_fun<rex_order, uint64_t, &rex_order::by_time>>> rex_order_table;
+
+
+   // statistic counters
+   struct [[eosio::table, eosio::contract("eosio.system")]] new_accounts_counter_meta {
+      // here, the 2 uint32_t control the “sliding window”
+      uint32_t new_accounts_counter_start_interval; // epoch for the first interval the new_accounts_count is tracked here
+      uint32_t new_accounts_counter_start_interval_pos; // the first interval’s position, emulating a queue actually
+
+      // accumulated all number of accounts since this mechanisms takes effect
+      uint64_t accumulated_accounts_count;
+
+      // last block generation epoch
+      uint64_t last_block_generated_at;
+
+      uint64_t  primary_key()const { return 1; }
+   };
+
+   // contains 1 new_accounts_counter_meta
+   typedef eosio::multi_index<"accountcntrm"_n, new_accounts_counter_meta> new_accounts_counter_meta_table;
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] new_accounts_counter {
+      uint32_t count;
+   };
+
+   // counter for d-th interval since first interval is in element (d + N - new_accounts_count_start_interval_pos) % N
+   typedef eosio::multi_index<"accountcntr"_n, new_accounts_counter> new_accounts_counter_table;
+
 
    struct rex_order_outcome {
       bool success;
