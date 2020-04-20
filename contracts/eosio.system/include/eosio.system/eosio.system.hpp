@@ -535,7 +535,7 @@ namespace eosiosystem {
       // last block generation epoch
       uint64_t last_block_generated_at;
 
-      uint64_t  primary_key()const { return 1; }
+      uint64_t primary_key()const { return 1; }
    };
 
    // contains 1 new_accounts_counter_meta
@@ -543,6 +543,8 @@ namespace eosiosystem {
 
    struct [[eosio::table, eosio::contract("eosio.system")]] new_accounts_counter {
       uint32_t count;
+      uint64_t pos;
+      uint64_t primary_key()const { return pos; }
    };
 
    // counter for d-th interval since first interval is in element (d + N - new_accounts_count_start_interval_pos) % N
