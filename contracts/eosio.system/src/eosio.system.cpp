@@ -359,13 +359,16 @@ namespace eosiosystem {
 
       eosio::print("newaccount: Update statistic counter.");
       // update statistics counter
-      new_accounts_counter_meta_table accountcntrm( get_self(), 1 );
-      auto meta_it = accountcntrm.find(1);
+      new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
+      auto meta_it = accountcntrm.find(0);
       // only after the meta table is initialized, start to update it
       if (meta_it != accountcntrm.end()) {
          // meta_it->accumulated_accounts_count++;
          accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
             row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
+            row.new_accounts_counter_start_interval = row.new_accounts_counter_start_interval;
+            row.new_accounts_counter_start_interval_pos = row.new_accounts_counter_start_interval_pos;
+            row.pos = 0;
          });
 
          auto curepoch = current_time_point().sec_since_epoch();
@@ -375,10 +378,11 @@ namespace eosiosystem {
 
          new_accounts_counter_table accountcntr(get_self(), pos);
          auto counter_it = accountcntr.find(pos);
-         check(counter_it != accountcntr.end(), "New accounts statistical counters corrupted");
+         check(counter_it != accountcntr.end(), "newaccount: New accounts statistical counters corrupted");
          // counter_it->count++;
          accountcntr.modify(counter_it, get_self(), [&](auto& row) {
             row.count = row.count + 1;
+            row.pos = row.pos;
          });
       }
    }
