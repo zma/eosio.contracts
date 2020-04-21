@@ -28,9 +28,9 @@
 // interval length, in seconds.
 // the interval should be strictly larger than the block time
 // and multiple times of the block time
-#define STATISTICS_NEW_ACCOUNTS_INTERVAL 2
+#define STATISTICS_NEW_ACCOUNTS_INTERVAL 4
 // number of intervals to keep
-#define STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT 365
+#define STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT 20
 
 namespace eosiosystem {
 
