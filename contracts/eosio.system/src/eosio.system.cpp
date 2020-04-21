@@ -357,6 +357,7 @@ namespace eosiosystem {
 
       set_resource_limits( newact, 0, 0, 0 );
 
+      eosio::print("newaccount: Update statistic counter.");
       // update statistics counter
       new_accounts_counter_meta_table accountcntrm( get_self(), 1 );
       auto meta_it = accountcntrm.find(1);

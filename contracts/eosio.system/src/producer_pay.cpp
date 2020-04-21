@@ -66,6 +66,7 @@ namespace eosiosystem {
 
       // update statistic counters, initialize them if they are not initialized
       // yet
+      print("Update statistic counter.");
       new_accounts_counter_meta_table accountcntrm( get_self(), 1 );
       auto meta_it = accountcntrm.find(1);
       // after the meta table is initialized, check whether need to move the
