@@ -534,10 +534,7 @@ namespace eosiosystem {
       // accumulated all number of accounts since this mechanisms takes effect
       uint64_t accumulated_accounts_count;
 
-      // position, fixed to be 0
-      uint64_t pos;
-
-      uint64_t primary_key()const { return pos; }
+      uint64_t primary_key()const { return 0; }
    };
 
    // contains 1 new_accounts_counter_meta

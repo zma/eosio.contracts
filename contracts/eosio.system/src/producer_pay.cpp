@@ -14,9 +14,6 @@ namespace eosiosystem {
 
       // update statistic counters, initialize them if they are not initialized
       // yet
-      // check(false, "Update statistic counter.");
-
-      print("Update statistic counter.");
       new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
       auto meta_it = accountcntrm.find(0);
       // after the meta table is initialized, check whether need to move the
@@ -58,7 +55,6 @@ namespace eosiosystem {
             row.new_accounts_counter_start_interval = curepoch;
             row.new_accounts_counter_start_interval_pos = 0;
             row.accumulated_accounts_count = 0;
-            row.pos = 0;
          });
 
          for (int64_t pos = 0; pos < STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT; ++pos) {

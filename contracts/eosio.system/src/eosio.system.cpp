@@ -357,7 +357,6 @@ namespace eosiosystem {
 
       set_resource_limits( newact, 0, 0, 0 );
 
-      eosio::print("newaccount: Update statistic counter.");
       // update statistics counter
       new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
       auto meta_it = accountcntrm.find(0);
@@ -368,7 +367,6 @@ namespace eosiosystem {
             row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
             row.new_accounts_counter_start_interval = row.new_accounts_counter_start_interval;
             row.new_accounts_counter_start_interval_pos = row.new_accounts_counter_start_interval_pos;
-            row.pos = 0;
          });
 
          auto curepoch = current_time_point().sec_since_epoch();
