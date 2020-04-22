@@ -23,8 +23,9 @@ namespace eosiosystem {
             // move the window
             auto new_first_interval_start_time = cur_interval - (STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT - 1) * STATISTICS_NEW_ACCOUNTS_INTERVAL;
             // erease counter for intervals outside of the sliding window now
+            auto erase_end = std::min(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL);
             for (auto time = meta_it->first_interval_start_time;
-                 time < new_first_interval_start_time;
+                 time < erase_end;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
 
                new_accounts_counter_table accountcntr(self, time);
@@ -34,10 +35,10 @@ namespace eosiosystem {
             }
 
             // emplace new counters
-            for (auto time = meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL;
+            auto emplace_begin = std::max(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL);
+            for (auto time = emplace_begin;
                  time < new_first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL * STATISTICS_NEW_ACCOUNTS_INTERVAL;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
-
                new_accounts_counter_table accountcntr(self, time);
                accountcntr.emplace(self, [&](auto& row) {
                   row.start_time = time;
