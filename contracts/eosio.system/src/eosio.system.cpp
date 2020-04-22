@@ -357,31 +357,30 @@ namespace eosiosystem {
 
       set_resource_limits( newact, 0, 0, 0 );
 
-      // update statistics counter
+      // update statistics counters
+      new_accounts_counter_bookkeep(get_self());
+
       new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
       auto meta_it = accountcntrm.find(0);
       // only after the meta table is initialized, start to update it
-      if (meta_it != accountcntrm.end()) {
-         // meta_it->accumulated_accounts_count++;
-         accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
-            row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
-         });
+      check(meta_it != accountcntrm.end(), "newaccount: accountcntrm not initialized");
 
-         auto curepoch = current_time_point().sec_since_epoch();
-         auto passed_intervals = (curepoch - meta_it->new_accounts_counter_start_interval) / STATISTICS_NEW_ACCOUNTS_INTERVAL;
-         auto pos = meta_it->new_accounts_counter_start_interval_pos + passed_intervals;
-         pos = pos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
+      // meta_it->accumulated_accounts_count++;
+      accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
+         row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
+      });
 
-         new_accounts_counter_table accountcntr(get_self(), pos);
-         auto counter_it = accountcntr.find(pos);
-         check(counter_it != accountcntr.end(), "newaccount: New accounts statistical counters corrupted");
-         // counter_it->count++;
-         auto newcount = counter_it->count + 1;
-         accountcntr.modify(counter_it, get_self(), [&](auto& row) {
-            row.count = newcount;
-            row.pos = pos;
-         });
-      }
+      auto cur_epoch = current_time_point().sec_since_epoch();
+      auto cur_start_time = cur_epoch / STATISTICS_NEW_ACCOUNTS_INTERVAL * STATISTICS_NEW_ACCOUNTS_INTERVAL;
+
+      new_accounts_counter_table accountcntr(get_self(), cur_start_time);
+      auto counter_it = accountcntr.find(cur_start_time);
+      check(counter_it != accountcntr.end(), "newaccount: New accounts statistical counters corrupted");
+
+      // counter_it->count++;
+      accountcntr.modify(counter_it, get_self(), [&](auto& row) {
+         row.count = counter_it->count + 1;
+      });
    }
 
    void native::setabi( const name& acnt, const std::vector<char>& abi ) {

@@ -527,9 +527,8 @@ namespace eosiosystem {
 
    // statistic counters
    struct [[eosio::table, eosio::contract("eosio.system")]] new_accounts_counter_meta {
-      // here, the 2 uint32_t control the “sliding window”
-      uint32_t new_accounts_counter_start_interval; // epoch for the first interval the new_accounts_count is tracked here
-      uint32_t new_accounts_counter_start_interval_pos; // the first interval’s position, emulating a queue actually
+      // start time of the first interval
+      uint32_t first_interval_start_time;
 
       // accumulated all number of accounts since this mechanisms takes effect
       uint64_t accumulated_accounts_count;
@@ -541,12 +540,14 @@ namespace eosiosystem {
    typedef eosio::multi_index<"accountcntrm"_n, new_accounts_counter_meta> new_accounts_counter_meta_table;
 
    struct [[eosio::table, eosio::contract("eosio.system")]] new_accounts_counter {
+      // start epoch time of this interval
+      uint64_t start_time;
+      // the number of new accounts in the interval starting from start_time
       uint32_t count;
-      uint64_t pos;
-      uint64_t primary_key()const { return pos; }
+
+      uint64_t primary_key()const { return start_time; }
    };
 
-   // counter for d-th interval since first interval is in element (d + N - new_accounts_count_start_interval_pos) % N
    typedef eosio::multi_index<"accountcntr"_n, new_accounts_counter> new_accounts_counter_table;
 
 
@@ -555,6 +556,16 @@ namespace eosiosystem {
       asset proceeds;
       asset stake_change;
    };
+
+
+   /**
+    * new accounts statitics counter book keeping
+    *
+    * if the booking keeping tables are not initialized, initialized them
+    * accordingly.
+    *
+    */
+   void new_accounts_counter_bookkeep(const eosio::name& self);
 
    /**
     * The EOSIO system contract. The EOSIO system contract governs ram market, voters, producers, global state.
