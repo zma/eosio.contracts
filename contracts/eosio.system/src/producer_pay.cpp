@@ -12,61 +12,6 @@ namespace eosiosystem {
 
       require_auth(get_self());
 
-      // update statistic counters, initialize them if they are not initialized
-      // yet
-      new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
-      auto meta_it = accountcntrm.find(0);
-      // after the meta table is initialized, check whether need to move the
-      // tracking window
-      auto curepoch = current_time_point().sec_since_epoch();
-      if (meta_it != accountcntrm.end()) {
-         auto passed_intervals = (curepoch - meta_it->new_accounts_counter_start_interval) / STATISTICS_NEW_ACCOUNTS_INTERVAL;
-         if (passed_intervals >= STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT) {
-            // move the window
-            auto newstartpos = meta_it->new_accounts_counter_start_interval_pos + passed_intervals + 1;
-            // clean old data
-            for (auto pos = meta_it->new_accounts_counter_start_interval_pos;
-                 pos < newstartpos;
-                 ++pos) {
-
-               auto erasepos = pos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
-
-               new_accounts_counter_table accountcntr(get_self(), erasepos);
-               auto counter_it = accountcntr.find(erasepos);
-               check(counter_it != accountcntr.end(), "onblock: New accounts statistical counters corrupted");
-               accountcntr.modify(counter_it, get_self(), [&](auto& row) {
-                  row.count = 0;
-                  row.pos = row.pos;
-               });
-            }
-
-            // update accountcntrm
-            accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
-               row.new_accounts_counter_start_interval = curepoch;
-               row.new_accounts_counter_start_interval_pos = newstartpos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
-               row.accumulated_accounts_count = row.accumulated_accounts_count;
-            });
-         }
-      } else {
-         // initialized the counters
-         // this make it works even if the system contract is upgraded
-         // to have this function
-         accountcntrm.emplace(get_self(), [&](auto& row) {
-            row.new_accounts_counter_start_interval = curepoch;
-            row.new_accounts_counter_start_interval_pos = 0;
-            row.accumulated_accounts_count = 0;
-         });
-
-         for (int64_t pos = 0; pos < STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT; ++pos) {
-            new_accounts_counter_table accountcntr(get_self(), pos);
-            auto counter_it = accountcntr.find(pos);
-            accountcntr.emplace(get_self(), [&](auto& row) {
-               row.count = 0;
-               row.pos = pos;
-            });
-         }
-      }
-
       block_timestamp timestamp;
       name producer;
       _ds >> timestamp >> producer;
@@ -118,6 +63,64 @@ namespace eosiosystem {
             }
          }
       }
+
+      // update statistic counters, initialize them if they are not initialized
+      // yet
+      new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
+      auto meta_it = accountcntrm.find(0);
+      // after the meta table is initialized, check whether need to move the
+      // tracking window
+      auto curepoch = current_time_point().sec_since_epoch();
+      if (meta_it != accountcntrm.end()) {
+         auto passed_intervals = (curepoch - meta_it->new_accounts_counter_start_interval) / STATISTICS_NEW_ACCOUNTS_INTERVAL;
+         if (passed_intervals >= STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT) {
+            // move the window
+            auto newstartpos = meta_it->new_accounts_counter_start_interval_pos +
+               passed_intervals - STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT + 1;
+            // reset counter for intervals outside of the sliding window now
+            for (auto pos = meta_it->new_accounts_counter_start_interval_pos;
+                 pos < newstartpos;
+                 ++pos) {
+
+               auto erasepos = pos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
+
+               new_accounts_counter_table accountcntr(get_self(), erasepos);
+               auto counter_it = accountcntr.find(erasepos);
+               check(counter_it != accountcntr.end(), "onblock: New accounts statistical counters corrupted");
+               accountcntr.modify(counter_it, get_self(), [&](auto& row) {
+                  row.count = 0;
+                  row.pos = erasepos;
+               });
+            }
+
+            // update accountcntrm
+            accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
+               row.new_accounts_counter_start_interval = curepoch - (STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT-1)*STATISTICS_NEW_ACCOUNTS_INTERVAL;
+               row.new_accounts_counter_start_interval_pos = newstartpos % STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT;
+               row.accumulated_accounts_count = row.accumulated_accounts_count;
+            });
+         }
+      } else {
+         // initialized the counters
+         // this make it works even if the system contract is upgraded
+         // to have this function
+         accountcntrm.emplace(get_self(), [&](auto& row) {
+            row.new_accounts_counter_start_interval = curepoch;
+            row.new_accounts_counter_start_interval_pos = 0;
+            row.accumulated_accounts_count = 0;
+         });
+
+         for (int64_t pos = 0; pos < STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT; ++pos) {
+            new_accounts_counter_table accountcntr(get_self(), pos);
+            auto counter_it = accountcntr.find(pos);
+            accountcntr.emplace(get_self(), [&](auto& row) {
+               row.count = 0;
+               row.pos = pos;
+            });
+         }
+      }
+
+
    }
 
    void system_contract::claimrewards( const name& owner ) {

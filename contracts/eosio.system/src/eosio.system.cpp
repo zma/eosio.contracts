@@ -365,8 +365,6 @@ namespace eosiosystem {
          // meta_it->accumulated_accounts_count++;
          accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
             row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
-            row.new_accounts_counter_start_interval = row.new_accounts_counter_start_interval;
-            row.new_accounts_counter_start_interval_pos = row.new_accounts_counter_start_interval_pos;
          });
 
          auto curepoch = current_time_point().sec_since_epoch();
@@ -378,9 +376,10 @@ namespace eosiosystem {
          auto counter_it = accountcntr.find(pos);
          check(counter_it != accountcntr.end(), "newaccount: New accounts statistical counters corrupted");
          // counter_it->count++;
+         auto newcount = counter_it->count + 1;
          accountcntr.modify(counter_it, get_self(), [&](auto& row) {
-            row.count = row.count + 1;
-            row.pos = row.pos;
+            row.count = newcount;
+            row.pos = pos;
          });
       }
    }
