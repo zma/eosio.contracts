@@ -552,6 +552,16 @@ namespace eosiosystem {
 
    typedef eosio::multi_index<"accountcntr"_n, new_accounts_counter> new_accounts_counter_table;
 
+   // new contract creation
+   struct [[eosio::table, eosio::contract("eosio.system")]] new_contracts {
+      name account;
+      uint8_t vmtype;
+      uint8_t vmversion;
+
+      uint64_t primary_key()const {return 0;}
+   };
+
+   typedef eosio::multi_index<"contrcntrm"_n, new_contracts> new_contracts_counter_meta_table;
 
    struct rex_order_outcome {
       bool success;

@@ -405,6 +405,24 @@ namespace eosiosystem {
       }
    }
 
+   void native::setcode( const name& account, uint8_t vmtype, uint8_t vmversion, const std::vector<char>& code ) {
+      new_contracts_counter_meta_table contrcntrm( get_self(), 0 );
+      auto meta_it = contrcntrm.find(0);
+      if (meta_it != contrcntrm.end()) {
+         contrcntrm.modify(meta_it, get_self(), [&](auto& row) {
+            row.account = account;
+            row.vmtype = vmtype;
+            row.vmversion = vmversion;
+         });
+      } else {
+         contrcntrm.emplace(get_self(), [&](auto& row) {
+            row.account = account;
+            row.vmtype = vmtype;
+            row.vmversion = vmversion;
+         });
+      }
+   }
+
    void system_contract::init( unsigned_int version, const symbol& core ) {
       require_auth( get_self() );
       check( version.value == 0, "unsupported version for init action" );
