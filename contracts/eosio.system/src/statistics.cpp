@@ -11,7 +11,7 @@ namespace eosiosystem {
    void new_accounts_counter_bookkeep(const eosio::name& self) {
       // update statistic counters, initialize them if they are not initialized
       // yet
-      new_accounts_counter_meta_table accountcntrm( self, 0 );
+      new_accounts_counter_meta_table accountcntrm( self, name("eosio").value );
       auto meta_it = accountcntrm.find(0);
       // after the meta table is initialized, check whether need to move the
       // tracking window
@@ -28,7 +28,7 @@ namespace eosiosystem {
                  time < erase_end;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
 
-               new_accounts_counter_table accountcntr(self, time);
+               new_accounts_counter_table accountcntr(self, name("eosio").value);
                auto counter_it = accountcntr.find(time);
                check(counter_it != accountcntr.end(), "onblock: New accounts statistical counters corrupted");
                accountcntr.erase(counter_it);
@@ -39,7 +39,7 @@ namespace eosiosystem {
             for (auto time = emplace_begin;
                  time < new_first_interval_start_time + STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
-               new_accounts_counter_table accountcntr(self, time);
+               new_accounts_counter_table accountcntr(self, name("eosio").value);
                accountcntr.emplace(self, [&](auto& row) {
                   row.start_time = time;
                   row.count = 0;

@@ -360,7 +360,7 @@ namespace eosiosystem {
       // update statistics counters
       new_accounts_counter_bookkeep(get_self());
 
-      new_accounts_counter_meta_table accountcntrm( get_self(), 0 );
+      new_accounts_counter_meta_table accountcntrm( get_self(), name("eosio").value );
       auto meta_it = accountcntrm.find(0);
 
       // the new_accounts_counter_bookkeep() function should ensure the row
@@ -369,14 +369,14 @@ namespace eosiosystem {
       if (meta_it != accountcntrm.end()) {
          // meta_it->accumulated_accounts_count++;
          accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
-            row.accumulated_accounts_count = row.accumulated_accounts_count + 1;
+            row.accumulated_accounts_count += 1;
          });
       }
 
       auto cur_epoch = current_time_point().sec_since_epoch();
       auto cur_start_time = cur_epoch / STATISTICS_NEW_ACCOUNTS_INTERVAL * STATISTICS_NEW_ACCOUNTS_INTERVAL;
 
-      new_accounts_counter_table accountcntr(get_self(), cur_start_time);
+      new_accounts_counter_table accountcntr(get_self(), name("eosio").value);
       auto counter_it = accountcntr.find(cur_start_time);
 
       // the new_accounts_counter_bookkeep() function should ensure the row
@@ -385,7 +385,7 @@ namespace eosiosystem {
       if (counter_it != accountcntr.end()) {
          // counter_it->count++;
          accountcntr.modify(counter_it, get_self(), [&](auto& row) {
-            row.count = counter_it->count + 1;
+            row.count += 1;
          });
       }
    }
