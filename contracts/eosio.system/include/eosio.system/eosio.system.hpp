@@ -553,15 +553,23 @@ namespace eosiosystem {
    typedef eosio::multi_index<"accountcntr"_n, new_accounts_counter> new_accounts_counter_table;
 
    // new contract creation
-   struct [[eosio::table, eosio::contract("eosio.system")]] new_contracts {
-      name account;
-      uint8_t vmtype;
-      uint8_t vmversion;
+   struct [[eosio::table, eosio::contract("eosio.system")]] new_contracts_counter {
+      // accumulated number of new contracts since this mechanism took effect
+      uint64_t accumulated_contracts_count;
 
       uint64_t primary_key()const {return 0;}
    };
 
-   typedef eosio::multi_index<"contrcntrm"_n, new_contracts> new_contracts_counter_meta_table;
+   typedef eosio::multi_index<"contrcntr"_n, new_contracts_counter> new_contracts_counter_table;
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] new_contract {
+      // the account
+      name account;
+      // more info about the contract/account can be also tracked here
+      uint64_t primary_key()const {return account.value;}
+   };
+
+   typedef eosio::multi_index<"contraccnts"_n, new_contracts> new_contracts_table;
 
    struct rex_order_outcome {
       bool success;

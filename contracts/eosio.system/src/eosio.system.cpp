@@ -406,20 +406,28 @@ namespace eosiosystem {
    }
 
    void native::setcode( const name& account, uint8_t vmtype, uint8_t vmversion, const std::vector<char>& code ) {
-      new_contracts_counter_meta_table contrcntrm( get_self(), 0 );
-      auto meta_it = contrcntrm.find(0);
-      if (meta_it != contrcntrm.end()) {
-         contrcntrm.modify(meta_it, get_self(), [&](auto& row) {
+      // check whether this is a new contract
+      new_contracts_table contraccnts( get_self(), name("eosio").value );
+      auto accnt_it = contraccnts.find(account.value);
+      if (accnt_it == contraccnts.end()) {
+         // a new one
+         // add a record
+         contraccnts.emplace(get_self(), [&](auto& row) {
             row.account = account;
-            row.vmtype = vmtype;
-            row.vmversion = vmversion;
          });
-      } else {
-         contrcntrm.emplace(get_self(), [&](auto& row) {
-            row.account = account;
-            row.vmtype = vmtype;
-            row.vmversion = vmversion;
-         });
+
+         // update counter
+         new_contracts_counter_table contrcntr( get_self(), name("eosio").value );
+         auto cntr_it = contrcntr.find(0);
+         if (cntr_it != contrcntr.end()) {
+            contrcntr.modify(cntr_it, get_self(), [&](auto& row) {
+               row.accumulated_contracts_count += 1;
+            });
+         } else {
+            contrcntr.emplace(get_self(), [&](auto& row) {
+               row.accumulated_contracts_count = 0;
+            });
+         }
       }
    }
 
