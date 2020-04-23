@@ -30,8 +30,9 @@ namespace eosiosystem {
 
                new_accounts_counter_table accountcntr(self, name("eosio").value);
                auto counter_it = accountcntr.find(time);
-               check(counter_it != accountcntr.end(), "onblock: New accounts statistical counters corrupted");
-               accountcntr.erase(counter_it);
+               if (counter_it != accountcntr.end()) {
+                  accountcntr.erase(counter_it);
+               }
             }
 
             // emplace new counters
