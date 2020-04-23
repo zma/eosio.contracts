@@ -19,11 +19,11 @@ namespace eosiosystem {
       auto cur_interval = cur_epoch / STATISTICS_NEW_ACCOUNTS_INTERVAL * STATISTICS_NEW_ACCOUNTS_INTERVAL;
       if (meta_it != accountcntrm.end()) {
          // clean up old counters, if they are now out of the sliding window
-         if (cur_interval - meta_it->first_interval_start_time >= STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL) {
+         if (cur_interval - meta_it->first_interval_start_time >= STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS) {
             // move the window
             auto new_first_interval_start_time = cur_interval - (STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT - 1) * STATISTICS_NEW_ACCOUNTS_INTERVAL;
             // erease counter for intervals outside of the sliding window now
-            auto erase_end = std::min(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL);
+            auto erase_end = std::min(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS);
             for (auto time = meta_it->first_interval_start_time;
                  time < erase_end;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
@@ -35,9 +35,9 @@ namespace eosiosystem {
             }
 
             // emplace new counters
-            auto emplace_begin = std::max(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL);
+            auto emplace_begin = std::max(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS);
             for (auto time = emplace_begin;
-                 time < new_first_interval_start_time + STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT * STATISTICS_NEW_ACCOUNTS_INTERVAL;
+                 time < new_first_interval_start_time + STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS;
                  time += STATISTICS_NEW_ACCOUNTS_INTERVAL) {
                new_accounts_counter_table accountcntr(self, time);
                accountcntr.emplace(self, [&](auto& row) {
