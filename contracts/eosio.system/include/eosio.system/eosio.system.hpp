@@ -570,7 +570,7 @@ namespace eosiosystem {
       uint64_t primary_key()const {return account.value;}
    };
 
-   typedef eosio::multi_index<"contraccnts"_n, new_contracts> new_contracts_table;
+   typedef eosio::multi_index<"contraccnts"_n, new_contract> new_contracts_table;
 
    struct rex_order_outcome {
       bool success;
