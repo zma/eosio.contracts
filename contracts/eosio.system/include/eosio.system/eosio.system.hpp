@@ -552,7 +552,7 @@ namespace eosiosystem {
 
    typedef eosio::multi_index<"accountcntr"_n, new_accounts_counter> new_accounts_counter_table;
 
-   // new contract creation
+   // new contracts counter
    struct [[eosio::table, eosio::contract("eosio.system")]] new_contracts_counter {
       // accumulated number of new contracts since this mechanism took effect
       uint64_t accumulated_contracts_count;
@@ -566,6 +566,7 @@ namespace eosiosystem {
       // the account
       name account;
       // more info about the contract/account can be also tracked here
+
       uint64_t primary_key()const {return account.value;}
    };
 
