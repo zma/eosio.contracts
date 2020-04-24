@@ -426,7 +426,7 @@ namespace eosiosystem {
             });
          } else {
             contrcntr.emplace(get_self(), [&](auto& row) {
-               row.accumulated_contracts_count = 0;
+               row.accumulated_contracts_count = 1;
             });
          }
       }
