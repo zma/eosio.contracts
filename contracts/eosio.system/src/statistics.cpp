@@ -67,7 +67,7 @@ namespace eosiosystem {
 
          for (int64_t cnt = 0; cnt < STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT; ++cnt) {
             auto start_time = cur_interval + cnt * STATISTICS_NEW_ACCOUNTS_INTERVAL;
-            new_accounts_counter_table accountcntr(self, start_time);
+            new_accounts_counter_table accountcntr(self, name("eosio").value);
             auto counter_it = accountcntr.find(start_time);
             accountcntr.emplace(self, [&](auto& row) {
                row.start_time = start_time;
