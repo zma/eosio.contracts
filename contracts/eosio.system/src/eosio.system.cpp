@@ -370,6 +370,7 @@ namespace eosiosystem {
          // meta_it->accumulated_accounts_count++;
          accountcntrm.modify(meta_it, get_self(), [&](auto& row) {
             row.accumulated_accounts_count += 1;
+            row.accumulated_latest_accounts_count += 1;
          });
       }
 

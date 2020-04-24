@@ -20,9 +20,10 @@ namespace eosiosystem {
       if (meta_it != accountcntrm.end()) {
          // clean up old counters, if they are now out of the sliding window
          if (cur_interval - meta_it->first_interval_start_time >= STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS) {
-            // move the window
+            // move the window, and update the accumulated latest new account counters
+            auto latest_accounts = meta_it->accumulated_latest_accounts_count;
             auto new_first_interval_start_time = cur_interval - (STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT - 1) * STATISTICS_NEW_ACCOUNTS_INTERVAL;
-            // erease counter for intervals outside of the sliding window now
+            // erease counters for intervals outside of the sliding window now
             auto erase_end = std::min(new_first_interval_start_time, meta_it->first_interval_start_time + STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS);
             for (auto time = meta_it->first_interval_start_time;
                  time < erase_end;
@@ -32,6 +33,7 @@ namespace eosiosystem {
                auto counter_it = accountcntr.find(time);
                if (counter_it != accountcntr.end()) {
                   accountcntr.erase(counter_it);
+                  latest_accounts -= counter_it->count;
                }
             }
 
@@ -50,6 +52,7 @@ namespace eosiosystem {
             // update accountcntrm
             accountcntrm.modify(meta_it, self, [&](auto& row) {
                row.first_interval_start_time = new_first_interval_start_time;
+               row.accumulated_latest_accounts_count = latest_accounts;
             });
          }
       } else {
@@ -59,6 +62,7 @@ namespace eosiosystem {
          accountcntrm.emplace(self, [&](auto& row) {
             row.first_interval_start_time = cur_interval;
             row.accumulated_accounts_count = 0;
+            row.accumulated_latest_accounts_count = 0;
          });
 
          for (int64_t cnt = 0; cnt < STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT; ++cnt) {

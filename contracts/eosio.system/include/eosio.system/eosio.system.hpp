@@ -535,6 +535,9 @@ namespace eosiosystem {
       // accumulated all number of accounts since this mechanisms takes effect
       uint64_t accumulated_accounts_count;
 
+      // accumulated all number of accounts since the first interval time
+      uint64_t accumulated_latest_accounts_count;
+
       uint64_t primary_key()const { return 0; }
    };
 
