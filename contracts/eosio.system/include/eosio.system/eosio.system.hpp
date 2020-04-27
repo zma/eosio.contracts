@@ -568,11 +568,11 @@ namespace eosiosystem {
    struct [[eosio::table, eosio::contract("eosio.system")]] new_contract {
       // the account
       name account;
-      // the latest version % 2^32. The version increases by 1 each time
-      // starting from 0
-      uint32_t version;
+      // the latest version, starting from 0. The version increases by 1 each
+      // time until it reaches 2^64-1.
+      uint64_t version;
 
-      // more info about the contract/account can be also tracked here
+      // more info about the contract/account can also be tracked here
 
       uint64_t primary_key()const {return account.value;}
    };

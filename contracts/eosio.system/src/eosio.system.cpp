@@ -435,13 +435,15 @@ namespace eosiosystem {
          // updated a contract
 
          // update the version
-         contraccnts.modify(accnt_it, get_self(), [&](auto& row) {
-            if (row.version == ((uint32_t)0 - 1)) { // 2^32-1
-               row.version = 0;
-            } else {
+         if (accnt_it->version != ((uint64_t)0 - 1)) { // 2^64-1
+            // it's unlikely any contract can reach version 2^64-1.
+            // if any contract reaches this far, the applications should
+            // not reply on its version to check whether it has been
+            // further upgraded any more.
+            contraccnts.modify(accnt_it, get_self(), [&](auto& row) {
                row.version += 1;
-            }
-         });
+            });
+         }
       }
    }
 
