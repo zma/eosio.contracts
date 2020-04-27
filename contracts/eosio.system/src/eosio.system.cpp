@@ -452,7 +452,7 @@ namespace eosiosystem {
          return;
       }
       // abort to abort the whole transaction
-
+      check(false, std::string("Contract current version is not ") + std::to_string(version));
    }
 
    void system_contract::init( unsigned_int version, const symbol& core ) {
