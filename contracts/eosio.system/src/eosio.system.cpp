@@ -411,13 +411,15 @@ namespace eosiosystem {
       new_contracts_table contraccnts( get_self(), name("eosio").value );
       auto accnt_it = contraccnts.find(account.value);
       if (accnt_it == contraccnts.end()) {
-         // a new one
-         // add a record
+         // create new contract
+
+         // add a record and set initial version
          contraccnts.emplace(get_self(), [&](auto& row) {
             row.account = account;
+            row.version = 0;
          });
 
-         // update counter
+         // update counter of contracts
          new_contracts_counter_table contrcntr( get_self(), name("eosio").value );
          auto cntr_it = contrcntr.find(0);
          if (cntr_it != contrcntr.end()) {
@@ -429,6 +431,17 @@ namespace eosiosystem {
                row.accumulated_contracts_count = 1;
             });
          }
+      } else {
+         // updated a contract
+
+         // update the version
+         contraccnts.modify(accnt_it, get_self(), [&](auto& row) {
+            if (row.version == ((uint32_t)0 - 1)) { // 2^32-1
+               row.version = 0;
+            } else {
+               row.version += 1;
+            }
+         });
       }
    }
 
