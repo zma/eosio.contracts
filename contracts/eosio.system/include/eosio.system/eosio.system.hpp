@@ -1239,6 +1239,17 @@ namespace eosiosystem {
          [[eosio::action]]
          void setinflation( int64_t annual_rate, int64_t inflation_pay_factor, int64_t votepay_factor );
 
+         /**
+          * Check whether the current contract version is the version specified.
+          * If the version does not match, abort. Otherwise, no other
+          * operations furthr done.
+          *
+          * @param contract - contract/account name to be verified.
+          * @param version - the version number of the contract.
+          */
+         [[eosio::action]]
+         void checkversion( const name& contract, uint32_t version );
+
          using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
          using setacctnet_action = eosio::action_wrapper<"setacctnet"_n, &system_contract::setacctnet>;
@@ -1285,6 +1296,7 @@ namespace eosiosystem {
          using setalimits_action = eosio::action_wrapper<"setalimits"_n, &system_contract::setalimits>;
          using setparams_action = eosio::action_wrapper<"setparams"_n, &system_contract::setparams>;
          using setinflation_action = eosio::action_wrapper<"setinflation"_n, &system_contract::setinflation>;
+         using checkversion_action = eosio::action_wrapper<"checkversion"_n, &system_contract::checkversion>;
 
       private:
          // Implementation details:

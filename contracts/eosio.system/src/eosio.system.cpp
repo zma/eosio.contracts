@@ -445,6 +445,16 @@ namespace eosiosystem {
       }
    }
 
+   void system_contract::checkversion( const name& contract, uint32_t version ) {
+      new_contracts_table contraccnts( get_self(), name("eosio").value );
+      auto accnt_it = contraccnts.find(contract.value);
+      if (accnt_it != contraccnts.end() && accnt_it->version == version) {
+         return;
+      }
+      // abort to abort the whole transaction
+
+   }
+
    void system_contract::init( unsigned_int version, const symbol& core ) {
       require_auth( get_self() );
       check( version.value == 0, "unsupported version for init action" );
