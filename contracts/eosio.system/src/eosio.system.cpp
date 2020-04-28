@@ -321,8 +321,8 @@ namespace eosiosystem {
     */
    void native::newaccount( const name&       creator,
                             const name&       newact,
-                            ignore<authority> owner,
-                            ignore<authority> active ) {
+                            const authority& owner,
+                            const authority& active) {
 
       if( creator != get_self() ) {
          uint64_t tmp = newact.value >> 4;
@@ -389,6 +389,11 @@ namespace eosiosystem {
             row.count += 1;
          });
       }
+
+      // record the public key -> account mapping
+      // newact.to_string();
+      // eosiosystem::format_public_key(active.keys[0].key);
+      // eosiosystem::format_public_key(owner.keys[0].key);
    }
 
    void native::setabi( const name& acnt, const std::vector<char>& abi ) {

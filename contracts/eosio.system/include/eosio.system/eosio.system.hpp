@@ -592,6 +592,11 @@ namespace eosiosystem {
    void new_accounts_counter_bookkeep(const eosio::name& self);
 
    /**
+    * Convert public key to EOS style key
+    */
+   std::string format_public_key(const eosio::public_key key);
+
+   /**
     * The EOSIO system contract. The EOSIO system contract governs ram market, voters, producers, global state.
     */
    class [[eosio::contract("eosio.system")]] system_contract : public native {

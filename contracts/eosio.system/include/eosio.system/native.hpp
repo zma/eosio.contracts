@@ -153,8 +153,8 @@ namespace eosiosystem {
          [[eosio::action]]
          void newaccount( const name&       creator,
                           const name&       name,
-                          ignore<authority> owner,
-                          ignore<authority> active);
+                          const authority& owner,
+                          const authority& active);
 
          /**
           * Update authorization action updates pemission for an account.
