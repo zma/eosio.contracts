@@ -1,5 +1,7 @@
 #include <eosio.system/eosio.system.hpp>
 
+#include <sstream>
+
 #include <eosio/check.hpp>
 
 #include "abieos/abieos_numeric.hpp"
@@ -34,11 +36,20 @@ namespace eosiosystem {
          auto pubkey = format_public_key(key.key);
          // existing value of this key first
          auto acclist = get_key_accounts(pubkey, contract);
-         // TODO: check existing or not first
          if (acclist == "") {
             acclist = account.to_string();
          } else {
-            acclist += account.to_string();
+            // check already existing or not first
+            std::stringstream ss{acclist};
+            string acc;
+            while (ss.good()) {
+               getline(ss, acc, ';');
+               if (acc == acclist) {
+                  return;
+               }
+            }
+
+            acclist += ";" + account.to_string();
          }
 
          // new value
@@ -50,7 +61,7 @@ namespace eosiosystem {
       uint32_t valsize = 0;
       auto db = name{"eosio.kvdisk"};
       if (kv_get(db.value, contract.value, key.c_str(), key.length(), valsize)) {
-         std::vector<char> buf(valsize+1);
+         std::vector<char> buf(valsize);
          kv_get_data(db.value, 0, &(buf[0]), valsize);
          return std::string(std::begin(buf), std::end(buf));
       }

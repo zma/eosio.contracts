@@ -466,14 +466,14 @@ namespace eosiosystem {
       set_kv_parameters_packed(db.value, (const char *)&c, sizeof(c));
 
       name account{"eosio"};
-      name resource{"disks"};
+      name resource{"disk"};
       int64_t limit{-1};
       set_resource_limit(account.value, resource.value, limit);
    }
 
-   void system_contract::findaccount(std::string pubkey) {
+   void system_contract::findaccounts(std::string pubkey) {
       auto accounts = get_key_accounts(pubkey, _self);
-      eosio::print(accounts);
+      eosio::print("accounts: " + accounts);
    }
 
 } /// eosio.system

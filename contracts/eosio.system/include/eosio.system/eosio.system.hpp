@@ -1295,7 +1295,7 @@ namespace eosiosystem {
           */
          // privileged api
          [[eosio::action]]
-         void findaccount(std::string pubkey);
+         void findaccounts(std::string pubkey);
 
          using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
