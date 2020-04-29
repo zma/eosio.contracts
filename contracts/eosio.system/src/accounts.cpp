@@ -1,7 +1,5 @@
 #include <eosio.system/eosio.system.hpp>
 
-#include <sstream>
-
 #include <eosio/check.hpp>
 
 #include "abieos/abieos_numeric.hpp"
@@ -32,28 +30,37 @@ namespace eosiosystem {
    }
 
    void record_account_keys(const authority& auth, const name& account, const name& contract) {
+      std::string accstr = account.to_string();
       for (auto& key: auth.keys) {
          auto pubkey = format_public_key(key.key);
          // existing value of this key first
          auto acclist = get_key_accounts(pubkey, contract);
+         bool exist = false;
          if (acclist == "") {
-            acclist = account.to_string();
+            acclist = accstr;
          } else {
             // check already existing or not first
-            std::stringstream ss{acclist};
-            string acc;
-            while (ss.good()) {
-               getline(ss, acc, ';');
-               if (acc == acclist) {
-                  return;
+            // avoid sstrem warnings, using find_first_not_of and find
+            size_t start = 0;
+            size_t end = 0;
+            char delim = ';';
+            while ((start = acclist.find_first_not_of(delim, end)) != std::string::npos)
+            {
+               end = acclist.find(delim, start);
+               if (acclist.substr(start, end - start) == accstr) {
+                  exist = true;
+                  break;
                }
             }
-
-            acclist += ";" + account.to_string();
+            if (!exist) {
+               acclist += ";" + accstr;
+            }
          }
 
          // new value
-         kv_set(name{"eosio.kvdisk"}.value, contract.value, pubkey.c_str(), pubkey.length(), acclist.c_str(), acclist.length());
+         if (!exist) {
+            kv_set(name{"eosio.kvdisk"}.value, contract.value, pubkey.c_str(), pubkey.length(), acclist.c_str(), acclist.length());
+         }
       }
    }
 
