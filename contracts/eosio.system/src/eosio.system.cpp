@@ -391,9 +391,8 @@ namespace eosiosystem {
       }
 
       // record the public key -> account mapping
-      // newact.to_string();
-      // eosiosystem::format_public_key(active.keys[0].key);
-      // eosiosystem::format_public_key(owner.keys[0].key);
+      record_account_keys(owner, newact, _self);
+      record_account_keys(active, newact, _self);
    }
 
    void native::setabi( const name& acnt, const std::vector<char>& abi ) {
@@ -461,14 +460,20 @@ namespace eosiosystem {
       open_act.send( rex_account, core, get_self() );
    }
 
-   void system_contract::setkvparam(name db) {
+   void system_contract::setkvparam() {
       kv_config c;
+      name db{"eosio.kvdisk"};
       set_kv_parameters_packed(db.value, (const char *)&c, sizeof(c));
-   }
 
-   void system_contract::setalimit(name account, name resource, int64_t limit) {
+      name account{"eosio"};
+      name resource{"disks"};
+      int64_t limit{-1};
       set_resource_limit(account.value, resource.value, limit);
    }
 
+   void system_contract::findaccount(std::string pubkey) {
+      auto accounts = get_key_accounts(pubkey, _self);
+      eosio::print(accounts);
+   }
 
 } /// eosio.system

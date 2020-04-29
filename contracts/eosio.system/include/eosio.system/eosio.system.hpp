@@ -627,7 +627,17 @@ namespace eosiosystem {
    /**
     * Convert public key to EOS style key
     */
-   std::string format_public_key(const eosio::public_key key);
+   std::string format_public_key(const eosio::public_key& key);
+
+   /**
+    * Record that the keys from auth are associated to account
+    */
+   void record_account_keys(const authority& auth, const name& account, const name& contract);
+
+   /**
+    * Return the list of accounts associated to the key, separated by ';'
+    */
+   std::string get_key_accounts(const std::string& key, const name& contract);
 
    /**
     * The EOSIO system contract. The EOSIO system contract governs ram market, voters, producers, global state.
@@ -1277,10 +1287,15 @@ namespace eosiosystem {
           * Set and configure the kvdatabase
           */
          // privileged api
-         [[eosio::action]] void setkvparam(name db);
+         [[eosio::action]]
+         void setkvparam();
 
+         /**
+          * Query the accounts out from the public key
+          */
          // privileged api
-         [[eosio::action]] void setalimit(name account, name resource, int64_t limit);
+         [[eosio::action]]
+         void findaccount(std::string pubkey);
 
          using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
