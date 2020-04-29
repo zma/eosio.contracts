@@ -28,4 +28,7 @@ namespace eosiosystem {
 
       return abieos::public_key_to_string(pkey);
    }
+
+
 }
+

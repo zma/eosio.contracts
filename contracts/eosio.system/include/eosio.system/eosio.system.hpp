@@ -34,6 +34,39 @@
 // size of all intervals tracked
 #define STATISTICS_NEW_ACCOUNTS_ALL_INTERVALS (STATISTICS_NEW_ACCOUNTS_INTERVAL * STATISTICS_NEW_ACCOUNTS_INTERVAL_COUNT)
 
+// KV database interfaces and configurations
+extern "C" {
+   void set_kv_parameters_packed(uint64_t db, const char *data, int len);
+
+   int64_t kv_set(uint64_t db, uint64_t contract, const char *key, int keylen, const char *val, int vallen);
+
+   int     kv_it_lower_bound(int,int,int);
+   //int     kv_it_next(int itr);
+   //int     kv_it_prev(int itr);
+
+   int     kv_it_create(uint64_t db, uint64_t contract, const char *keyprefix, int len);
+
+   int     kv_it_key_compare(int itr, const char *key, int keylen);
+
+   //int     kv_it_key(int itr, int offset, char *dest, int size, int *actalsize);
+
+   int     kv_it_value(int itr, int offset, char *dest, int size,int *actalsize);
+
+   bool     kv_get(uint64_t db, uint64_t contract, const char* key, uint32_t key_size, uint32_t& value_size);
+
+   uint32_t kv_get_data(uint64_t db, uint32_t offset, char* data, uint32_t data_size);
+
+   void set_resource_limit(uint64_t account, uint64_t resource, int64_t);
+}
+
+// serialization is same as itself
+struct kv_config {
+   uint32_t version = 0; // must be 0
+   uint32_t keysizemax = 128;
+   uint32_t valsizemax = 1048576;
+   uint32_t itrmax = 1024;
+};
+
 namespace eosiosystem {
 
    using eosio::asset;
@@ -1239,6 +1272,15 @@ namespace eosiosystem {
           */
          [[eosio::action]]
          void setinflation( int64_t annual_rate, int64_t inflation_pay_factor, int64_t votepay_factor );
+
+         /**
+          * Set and configure the kvdatabase
+          */
+         // privileged api
+         [[eosio::action]] void setkvparam(name db);
+
+         // privileged api
+         [[eosio::action]] void setalimit(name account, name resource, int64_t limit);
 
          using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;

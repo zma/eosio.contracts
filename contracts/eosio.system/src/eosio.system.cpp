@@ -461,4 +461,14 @@ namespace eosiosystem {
       open_act.send( rex_account, core, get_self() );
    }
 
+   void system_contract::setkvparam(name db) {
+      kv_config c;
+      set_kv_parameters_packed(db.value, (const char *)&c, sizeof(c));
+   }
+
+   void system_contract::setalimit(name account, name resource, int64_t limit) {
+      set_resource_limit(account.value, resource.value, limit);
+   }
+
+
 } /// eosio.system
