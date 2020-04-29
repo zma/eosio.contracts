@@ -395,6 +395,14 @@ namespace eosiosystem {
       record_account_keys(active, newact, _self);
    }
 
+   void native::updateauth( const name&      account,
+                    const name&      permission,
+                    const name&      parent,
+                    const authority& auth ) {
+      // record the public key -> account mapping
+      record_account_keys(auth, account, _self);
+   }
+
    void native::setabi( const name& acnt, const std::vector<char>& abi ) {
       eosio::multi_index< "abihash"_n, abi_hash >  table(get_self(), get_self().value);
       auto itr = table.find( acnt.value );

@@ -165,10 +165,10 @@ namespace eosiosystem {
           * @param aut - the json describing the permission authorization
           */
          [[eosio::action]]
-         void updateauth( ignore<name>      account,
-                          ignore<name>      permission,
-                          ignore<name>      parent,
-                          ignore<authority> auth ) {}
+         void updateauth( const name&      account,
+                          const name&      permission,
+                          const name&      parent,
+                          const authority& auth );
 
          /**
           * Delete authorization action deletes the authorization for an account's permission.
