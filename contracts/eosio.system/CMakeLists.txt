@@ -7,6 +7,7 @@ add_contract(eosio.system eosio.system
    ${CMAKE_CURRENT_SOURCE_DIR}/src/rex.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/voting.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/src/statistics.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/accounts.cpp
 )
 
 target_include_directories(eosio.system
